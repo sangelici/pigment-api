@@ -5,7 +5,7 @@ const Favorite = require('../models/favorite.js')
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.requireOwnership
 const requireOwnership = customErrors.requireOwnership
-const removeBlanks = require('../../remove_blank_fields')
+const removeBlanks = require('../../lib/remove_blank_fields.js')
 const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
