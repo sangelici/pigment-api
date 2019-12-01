@@ -1,6 +1,6 @@
 const express = require('express')
 const passport = require('passport')
-const Artwork = require('../models/artwork.js')
+const Artwork = require('../models/Artwork.js')
 
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
@@ -40,8 +40,8 @@ router.get('/artworks/:id', requireToken, (req, res, next) => {
 
 // create an artwork listing
 router.post('/artworks', requireToken, (req, res, next) => {
-  req.body.listing.owner = req.user.id
-  Artwork.create(req.body.listing)
+  req.body.artwork.owner = req.user.id
+  Artwork.create(req.body.artwork)
     .then(artwork => res.status(201).json({ artwork: artwork.toObject() }))
     .catch(next)
 })
