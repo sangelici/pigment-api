@@ -1,7 +1,6 @@
 const express = require('express')
 const passport = require('passport')
-const Artwork = require('../models/Artwork.js')
-
+const Artwork = require('../models/artwork')
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
@@ -9,7 +8,7 @@ const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
-// public index -- ?????
+// public index
 router.get('/artworks', (req, res, next) => {
   Artwork.find()
     .then(artworks => {
@@ -30,7 +29,7 @@ router.get('/user_artworks', requireToken, (req, res, next) => {
     .catch(next)
 })
 
-// show one user listing
+// show one user artwork
 router.get('/artworks/:id', requireToken, (req, res, next) => {
   Artwork.findById(req.params.id)
     .then(handle404)
@@ -38,15 +37,18 @@ router.get('/artworks/:id', requireToken, (req, res, next) => {
     .catch(next)
 })
 
-// create an artwork listing
+// create an artwork
 router.post('/artworks', requireToken, (req, res, next) => {
   req.body.artwork.owner = req.user.id
+
   Artwork.create(req.body.artwork)
-    .then(artwork => res.status(201).json({ artwork: artwork.toObject() }))
+    .then(artwork => {
+      res.status(201).json({ artwork: artwork.toObject() })
+    })
     .catch(next)
 })
 
-// update an artwork listing
+// update an artwork
 router.patch('/artworks/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.artwork.owner
   Artwork.findById(req.params.id)
@@ -60,7 +62,7 @@ router.patch('/artworks/:id', requireToken, removeBlanks, (req, res, next) => {
     .catch(next)
 })
 
-// delete an artwork listing
+// delete an artwork
 router.delete('/artworks/:id', requireToken, (req, res, next) => {
   Artwork.findById(req.params.id)
     .populate('artwork')
