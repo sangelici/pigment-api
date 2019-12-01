@@ -13,7 +13,7 @@ const router = express.Router()
 router.get('/artworks', (req, res, next) => {
   Artwork.find()
     .then(artworks => {
-      return artworks.map(listing => listing.toObject())
+      return artworks.map(artwork => artwork.toObject())
     })
     .then(artworks => res.status(200).json({ artworks: artworks }))
     .catch(next)
@@ -54,7 +54,7 @@ router.patch('/artworks/:id', requireToken, removeBlanks, (req, res, next) => {
     .then(handle404)
     .then(artwork => {
       requireOwnership(req, artwork)
-      return artwork.updateOne(req.body.listing)
+      return artwork.updateOne(req.body.artwork)
     })
     .then(() => res.sendStatus(204))
     .catch(next)
