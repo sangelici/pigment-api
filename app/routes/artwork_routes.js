@@ -32,6 +32,7 @@ router.get('/user_artworks', requireToken, (req, res, next) => {
 // show one user artwork
 router.get('/artworks/:id', requireToken, (req, res, next) => {
   Artwork.findById(req.params.id)
+    .populate('owner')
     .then(handle404)
     .then(artwork => res.status(200).json({ artwork: artwork.toObject() }))
     .catch(next)
