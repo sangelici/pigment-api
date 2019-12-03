@@ -1,8 +1,12 @@
 const express = require('express')
 const passport = require('passport')
 const Artwork = require('../models/artwork')
-const Image = require('../models/image')
-const multer = require('mutlter')
+const multer = require('multer')
+const storage = multer.memoryStorage()
+const multerImage = multer({
+  storage: storage
+})
+const artworkApi = require('../../lib/artwork-api')
 
 const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
@@ -11,53 +15,6 @@ const removeBlanks = require('../../lib/remove_blank_fields')
 const requireToken = passport.authenticate('bearer', { session: false })
 
 const router = express.Router()
-
-// IMAGE
-const storage = multer.diskStorage({
-  // storage will require a request, file, and a callback
-  destination: function (req, file, cb) {
-    cb(null, Date.now() + file.originalName)
-  }
-})
-
-const fileFilter = (req, file, cb) => {
-  // the uploaded image can either be a jpg or a png file
-  if (file.mimeType === 'image.jpg' || file.mimeType === 'image.png') {
-    cb(null, true)
-  } else {
-    cb(null, false)
-  }
-}
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5
-  },
-  fileFilter: fileFilter
-})
-
-/*
-    stores image in uploads folder
-    using multer and creates a reference to the
-    file
-*/
-
-router.route('/uploadmulter')
-  .post(upload.single('imageData'), (req, res, next) => {
-    console.log(req.body)
-    const newImage = new Image({
-      imageName: req.body.imageName,
-      imageData: req.file.path
-    })
-
-    newImage.save()
-      .then((result) => {
-        console.log(result)
-        res.status(200).json({ success: true, document: result })
-      })
-      .catch(next)
-  })
 
 // ARTWORK
 // public index
@@ -91,12 +48,32 @@ router.get('/artworks/:id', requireToken, (req, res, next) => {
 })
 
 // create an artwork
-router.post('/artworks', requireToken, (req, res, next) => {
+router.post('/artworks', multerImage.single('file'), requireToken, (req, res, next) => {
+  console.log(req.file)
+  console.log('req.file is', req.file)
+  console.log('req.body is', req.body)
   req.body.artwork.owner = req.user.id
 
-  Artwork.create(req.body.artwork)
+  artworkApi(req.file)
+    .then(awsResponse => {
+      return Artwork.create(
+        req.body.artwork,
+        {
+          fileName: awsResponse.key,
+          fileType: req.file.mimetype,
+          title: req.body.title,
+          artist: req.body.artist,
+          description: req.body.description,
+          medium: req.body.medium,
+          size: req.body.size,
+          price: req.body.price,
+          owner: req.user.id
+        })
+    })
     .then(artwork => {
-      res.status(201).json({ artwork: artwork.toObject() })
+      res.status(201).json({
+        artwork: artwork.toObject()
+      })
     })
     .catch(next)
 })
@@ -128,4 +105,4 @@ router.delete('/artworks/:id', requireToken, (req, res, next) => {
     .catch(next)
 })
 
-module.exports = ImageRouter
+module.exports = router

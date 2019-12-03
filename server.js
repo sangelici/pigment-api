@@ -14,6 +14,9 @@ const favoriteRoutes = require('./app/routes/favorite_routes')
 const errorHandler = require('./lib/error_handler')
 const replaceToken = require('./lib/replace_token')
 const requestLogger = require('./lib/request_logger')
+// load secret keys for signing tokens from .env
+const dotenv = require('dotenv')
+dotenv.config()
 
 // require database configuration logic
 // `db` will be the actual Mongo URI as a string
@@ -54,9 +57,6 @@ app.use(replaceToken)
 // register passport authentication middleware
 app.use(auth)
 
-// create this uploads folder and create a static path reference to it
-app.use('/uploads', express.static('uploads'))
-
 // add `bodyParser` middleware which will parse JSON requests into
 // JS objects before they reach the route files.
 // The method `.use` sets up middleware for the Express application
@@ -70,7 +70,7 @@ app.use(requestLogger)
 // register route files
 app.use(exampleRoutes)
 app.use(userRoutes)
-app.use('/image', artworkRoutes)
+app.use(artworkRoutes)
 app.use(favoriteRoutes)
 
 // register error handling middleware
