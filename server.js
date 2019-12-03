@@ -9,6 +9,7 @@ const exampleRoutes = require('./app/routes/example_routes')
 const userRoutes = require('./app/routes/user_routes')
 const artworkRoutes = require('./app/routes/artwork_routes')
 const favoriteRoutes = require('./app/routes/favorite_routes')
+const ImageRouter = require('./app/routes/image_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -54,6 +55,9 @@ app.use(replaceToken)
 // register passport authentication middleware
 app.use(auth)
 
+// create this uploads folder and create a static path reference to it
+app.use('/uploads', express.static('uploads'))
+
 // add `bodyParser` middleware which will parse JSON requests into
 // JS objects before they reach the route files.
 // The method `.use` sets up middleware for the Express application
@@ -69,6 +73,7 @@ app.use(exampleRoutes)
 app.use(userRoutes)
 app.use(artworkRoutes)
 app.use(favoriteRoutes)
+app.use('/image', ImageRouter)
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
