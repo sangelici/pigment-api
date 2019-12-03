@@ -4,12 +4,14 @@ const ImageRouter = express.Router()
 const multer = require('mutlter')
 
 const storage = multer.diskStorage({
+  // storage will require a request, file, and a callback
   destination: function (req, file, cb) {
     cb(null, Date.now() + file.originalName)
   }
 })
 
 const fileFilter = (req, file, cb) => {
+  // the uploaded image can either be a jpg or a png file
   if (file.mimeType === 'image.jpg' || file.mimeType === 'image.png') {
     cb(null, true)
   } else {
