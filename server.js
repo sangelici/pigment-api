@@ -9,7 +9,6 @@ const exampleRoutes = require('./app/routes/example_routes')
 const userRoutes = require('./app/routes/user_routes')
 const artworkRoutes = require('./app/routes/artwork_routes')
 const favoriteRoutes = require('./app/routes/favorite_routes')
-const ImageRouter = require('./app/routes/image_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -71,9 +70,8 @@ app.use(requestLogger)
 // register route files
 app.use(exampleRoutes)
 app.use(userRoutes)
-app.use(artworkRoutes)
+app.use('/image', artworkRoutes)
 app.use(favoriteRoutes)
-app.use('/image', ImageRouter)
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be

@@ -21,6 +21,15 @@ const artworkSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  imageName: {
+    type: String,
+    default: 'none',
+    required: true
+  },
+  imageData: {
+    type: String,
+    required: true
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
