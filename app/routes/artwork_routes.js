@@ -3,9 +3,7 @@ const passport = require('passport')
 const Artwork = require('../models/artwork')
 const multer = require('multer')
 const storage = multer.memoryStorage()
-const multerImage = multer({
-  storage: storage
-})
+const multerArtwork = multer({ storage: storage })
 const artworkApi = require('../../lib/artwork-api')
 
 const customErrors = require('../../lib/custom_errors')
@@ -48,19 +46,20 @@ router.get('/artworks/:id', requireToken, (req, res, next) => {
 })
 
 // create an artwork
-router.post('/artworks', multerImage.single('file'), requireToken, (req, res, next) => {
-  console.log(req.file)
-  console.log('req.file is', req.file)
+router.post('/artworks', multerArtwork.single('file'), requireToken, (req, res, next) => {
+  const artworkFile = req.body.artwork.file
+
+  console.log('req.body.file is', req.body.artwork.file)
   console.log('req.body is', req.body)
   req.body.artwork.owner = req.user.id
 
-  artworkApi(req.file)
+  artworkApi(artworkFile)
     .then(awsResponse => {
       return Artwork.create(
         req.body.artwork,
         {
           fileName: awsResponse.key,
-          fileType: req.file.mimetype,
+          fileType: artworkFile.mimetype,
           title: req.body.title,
           artist: req.body.artist,
           description: req.body.description,
