@@ -48,16 +48,17 @@ router.get('/artworks/:id', requireToken, (req, res, next) => {
 // create an artwork
 router.post('/artworks', multerArtwork.single('file'), requireToken, (req, res, next) => {
   // const artworkFile = req.body.artwork.file
-  console.log(req)
-  console.table(req.body.artist)
+  // console.log(req)
+  console.log(req.body)
+  // console.table(req.body)
   // console.log('req.body.file is', req.body.artwork.file)
   // console.log('req.body is', req.body)
   req.body.owner = req.user.id
-
+  console.log(req.body.artwork)
   artworkApi(req.file)
     .then(awsResponse => {
+      console.log('This is aws:', awsResponse)
       return Artwork.create(
-        req.body.artwork,
         {
           fileName: awsResponse.key,
           fileType: req.file.mimetype,
@@ -79,14 +80,15 @@ router.post('/artworks', multerArtwork.single('file'), requireToken, (req, res, 
 })
 
 // update an artwork
-router.patch('/artworks/:id', requireToken, removeBlanks, (req, res, next) => {
-  delete req.body.artwork.owner
+router.patch('/artworks/:id', multerArtwork.single('file'), requireToken, removeBlanks, (req, res, next) => {
+  // delete req.body.owner
+  console.log('req', req)
   Artwork.findById(req.params.id)
     .populate('artwork')
     .then(handle404)
     .then(artwork => {
       requireOwnership(req, artwork)
-      return artwork.updateOne(req.body.artwork)
+      return artwork.updateOne(req.body)
     })
     .then(() => res.sendStatus(204))
     .catch(next)
