@@ -81,7 +81,7 @@ router.post('/artworks', multerArtwork.single('file'), requireToken, (req, res, 
 
 // update an artwork
 router.patch('/artworks/:id', multerArtwork.single('file'), requireToken, removeBlanks, (req, res, next) => {
-  // delete req.body.owner
+  delete req.body.owner
   // console.log('req', req)
   Artwork.findById(req.params.id)
     .populate('artwork')
