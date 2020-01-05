@@ -1,6 +1,7 @@
 const express = require('express')
 const passport = require('passport')
 const Artwork = require('../models/artwork')
+// handles the multipart formdata
 const multer = require('multer')
 const storage = multer.memoryStorage()
 const multerArtwork = multer({ storage: storage })
@@ -47,14 +48,9 @@ router.get('/artworks/:id', requireToken, (req, res, next) => {
 
 // create an artwork
 router.post('/artworks', multerArtwork.single('file'), requireToken, (req, res, next) => {
-  // const artworkFile = req.body.artwork.file
-  // console.log(req)
-  // console.log(req.body)
-  // console.table(req.body)
   // console.log('req.body.file is', req.body.artwork.file)
   // console.log('req.body is', req.body)
   req.body.owner = req.user.id
-  // console.log(req.body.artwork)
   artworkApi(req.file)
     .then(awsResponse => {
       // console.log('This is aws:', awsResponse)
